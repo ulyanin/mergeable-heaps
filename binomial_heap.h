@@ -14,7 +14,7 @@ public:
     BinomialHeap(const BinomialHeap &);
     BinomialHeap(const int &);
     BinomialHeap(Node *);
-    virtual void meld(BinomialHeap &);
+    virtual void meld(IMergeableHeap<int> &);
     virtual void insert(const int &);
     virtual int extractMin();
     virtual int getMin() const;
@@ -23,6 +23,7 @@ public:
     virtual void clear();
     static int KEY_INFINITY;
     Node * makeNewNode(Node *);
+    void print() const;
 private:
     void shrink();
     size_t maxDegree() const;
@@ -44,6 +45,7 @@ public:
     friend Node * mergeTree(Node * &, Node * &);
     friend Node * mergeSaveDegree(Node * &, Node * &, Node * &);
     friend int getKey(Node *);
+    friend void print(Node *, int);
     Node * makeNewNode(Node *);
 private:
     Node(const Node &);

@@ -14,7 +14,7 @@ public:
     SkewHeap();
     SkewHeap(const SkewHeap &);
     SkewHeap(const int &);
-    virtual void meld(SkewHeap &);
+    virtual void meld(IMergeableHeap<int> &);
     virtual void insert(const int &);
     virtual int extractMin();
     virtual int getMin() const;

@@ -12,7 +12,6 @@ public:
     LeftistHeap(const LeftistHeap &);
     LeftistHeap(const int &);
 protected:
-    //virtual Node * merge(Node * A, Node * B);
     LeftistTreeNode * castNode(Node *) const;
     size_t getRang(Node *) const;
     virtual void recalc(Node * &) const;
@@ -27,8 +26,6 @@ public:
     LeftistTreeNode();
     LeftistTreeNode(const int &);
     LeftistTreeNode(const LeftistTreeNode &);
-    //virtual void recalc();
-    //virtual bool needRotate() const;
     size_t& getRang();
 protected:
     size_t rang_;

@@ -37,6 +37,18 @@ BNodePtr mergeTree(BNodePtr &A, BNodePtr &B)
     }
 }
 
+void print(BNodePtr T, int d=0)
+{
+    if (!T)
+        return;
+    for (int i = 0; i < d; ++i)
+        std::cout << "\t";
+    std::cout << T->key_ << std::endl;
+    for (size_t deg = 0; deg < degree(T); ++deg) {
+        print(T->children_[deg], d + 1);
+    }
+}
+
 /*
  * this function merge Trees A, B and addtitional like bits, save result in A and returns it
  *   0 + 0 = 0 and additional is 0
@@ -87,6 +99,16 @@ BinomialHeap::Node::~Node()
     children_.clear();
 }
 
+void BinomialHeap::print() const
+{
+    std::cout << "-------------" << std::endl;
+    for (size_t deg = 0; deg < this->maxDegree(); ++deg) {
+        ::print(trees_[deg]);
+        std::cout << "____________\n";
+    }
+    std::cout << "-------------" << std::endl;
+}
+
 BNodePtr BinomialHeap::makeNewNode(Node * other)
 {
     if (!other)
@@ -101,10 +123,12 @@ BNodePtr BinomialHeap::Node::makeNewNode(Node * other)
     return new Node(*other);
 }
 
-void BinomialHeap::meld(BinomialHeap &other)
+void BinomialHeap::meld(IMergeableHeap<int> &otherBase)
 {
+    BinomialHeap & other = dynamic_cast<BinomialHeap &>(otherBase);
     BNodePtr overflow(nullptr);
     trees_.resize(std::max(this->maxDegree(), other.maxDegree()), nullptr);
+    other.trees_.resize(std::max(this->maxDegree(), other.maxDegree()), nullptr);
     for (size_t deg = 0; deg < other.maxDegree(); ++deg) {
         mergeSaveDegree(trees_[deg], other.trees_[deg], overflow, deg);
     }
@@ -113,6 +137,7 @@ void BinomialHeap::meld(BinomialHeap &other)
     if (overflow != nullptr) {
         trees_.push_back(overflow);
     }
+    //this->print();
 }
 
 BinomialHeap::BinomialHeap()

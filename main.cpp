@@ -335,21 +335,39 @@ TEST_F(HeapsTest, TestCorrectMedium)
 
 TEST_F(HeapPerfomanceTest, TestSkewLarge)
 {
-    int n = (int)log((float)MEDIUM_TEST);
+    int testSize = EXTRA_LARGE_TEST;
+    int n = (int)log((float)testSize);
     std::vector <IMergeableHeap<int> *> heaps(n, nullptr);
     generate(heaps.begin(), heaps.end(), [] () { return new SkewHeap(); });
-    TestTimeHeap(heaps, MEDIUM_TEST);
+    TestTimeHeap(heaps, testSize);
 }
 
 TEST_F(HeapPerfomanceTest, TestBinomialLarge)
 {
-    int n = (int)log((float)MEDIUM_TEST);
+    int testSize = EXTRA_LARGE_TEST;
+    int n = (int)log((float)testSize);
     std::vector <IMergeableHeap<int> *> heaps(n, nullptr);
     generate(heaps.begin(), heaps.end(), [] () { return new BinomialHeap(); });
-    TestTimeHeap(heaps, MEDIUM_TEST);
+    TestTimeHeap(heaps, testSize);
 }
 
+TEST_F(HeapPerfomanceTest, TestLeftistHeap)
+{
+    int testSize = EXTRA_LARGE_TEST;
+    int n = (int)log((float)testSize);
+    std::vector <IMergeableHeap<int> *> heaps(n, nullptr);
+    generate(heaps.begin(), heaps.end(), [] () { return new LeftistHeap(); });
+    TestTimeHeap(heaps, testSize);
+}
 
+TEST_F(HeapPerfomanceTest, TestSimpleHeap)
+{
+    int testSize = LARGE_TEST;
+    int n = (int)log((float)testSize);
+    std::vector <IMergeableHeap<int> *> heaps(n, nullptr);
+    generate(heaps.begin(), heaps.end(), [] () { return new SimpleHeap(); });
+    TestTimeHeap(heaps, testSize);
+}
 int main(int argc, char **argv)
 {
     std::cerr.setf(std::cerr.fixed);

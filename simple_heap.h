@@ -14,12 +14,15 @@ public:
     {
         data_.insert(k);
     }
-    void meld(SimpleHeap &other)
+
+    void meld(IMergeableHeap<int> &otherBase)
     {
+        SimpleHeap & other = dynamic_cast<SimpleHeap &>(otherBase);
         while (!other.empty()) {
             this->insert(other.extractMin());
         }
     }
+
     void insert(const int &k)
     {
         data_.insert(k);

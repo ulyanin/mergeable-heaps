@@ -24,8 +24,9 @@ SkewHeap::SkewHeap(const int &key)
    root = new Node(key);
 }
 
-void SkewHeap::meld(SkewHeap &other)
+void SkewHeap::meld(IMergeableHeap<int> &otherBase)
 {
+    SkewHeap& other = dynamic_cast<SkewHeap &>(otherBase);
     root = merge(root, other.root);
     other.root = nullptr;
 }

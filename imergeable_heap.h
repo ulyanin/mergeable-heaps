@@ -8,7 +8,7 @@ class IMergeableHeap
 {
 public:
     virtual ~IMergeableHeap() {}
-    virtual void meld(IMergeableHeap<T, Compare> &);
+    virtual void meld(IMergeableHeap<T, Compare> &) = 0;
     virtual void insert(const T& ) = 0;
     virtual T extractMin() = 0;
     virtual T getMin() const = 0;
@@ -17,7 +17,7 @@ public:
     virtual void clear() = 0;
 };
 
-
+/*
 template <class T, class CMP>
 void IMergeableHeap<T, CMP>::meld(IMergeableHeap<T, CMP> &other)
 {
@@ -25,6 +25,7 @@ void IMergeableHeap<T, CMP>::meld(IMergeableHeap<T, CMP> &other)
         this->insert(other.extractMin());
     }
 }
+*/
 /*
 template <class T>
 class BinaryTree
