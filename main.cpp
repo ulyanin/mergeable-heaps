@@ -335,18 +335,18 @@ TEST_F(HeapsTest, TestCorrectMedium)
 
 TEST_F(HeapPerfomanceTest, TestSkewLarge)
 {
-    int n = (int)log((float)LARGE_TEST);
+    int n = (int)log((float)MEDIUM_TEST);
     std::vector <IMergeableHeap<int> *> heaps(n, nullptr);
     generate(heaps.begin(), heaps.end(), [] () { return new SkewHeap(); });
-    TestTimeHeap(heaps, LARGE_TEST);
+    TestTimeHeap(heaps, MEDIUM_TEST);
 }
 
 TEST_F(HeapPerfomanceTest, TestBinomialLarge)
 {
-    int n = (int)log((float)LARGE_TEST);
+    int n = (int)log((float)MEDIUM_TEST);
     std::vector <IMergeableHeap<int> *> heaps(n, nullptr);
     generate(heaps.begin(), heaps.end(), [] () { return new BinomialHeap(); });
-    TestTimeHeap(heaps, LARGE_TEST);
+    TestTimeHeap(heaps, MEDIUM_TEST);
 }
 
 
