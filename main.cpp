@@ -11,7 +11,7 @@
 #include <algorithm>
 
 const int SMALL_TEST = 10;
-const int MEDIUM_TEST = 1e3;
+const int MEDIUM_TEST = 1e4;
 const int LARGE_TEST = 1e5;
 const int EXTRA_LARGE_TEST = 1e7;
 const int MAX_TEST = 1e8;
@@ -323,6 +323,63 @@ public:
     std::default_random_engine engine;
 };
 
+
+class HeapCompareWithSortTest : public ::testing::Test
+{
+protected:
+    typedef IMergeableHeap<int> * HeapPtr;
+    virtual void SetUp()
+    {
+    }
+
+    virtual void TearDown()
+    {
+    }
+
+    double TestStdSort(std::vector <int> &toSort)
+    {
+        auto start(std::chrono::steady_clock::now());
+        std::sort(toSort.begin(), toSort.end());
+        auto end(std::chrono::steady_clock::now());
+        return std::chrono::duration_cast<std::chrono::duration<double> > (end - start).count();
+    }
+
+    double TestHeapSort(HeapPtr heap, std::vector <int> toSort)
+    {
+        auto start(std::chrono::steady_clock::now());
+        for (int elem : toSort) {
+            heap->insert(elem);
+        }
+        for (auto &elem : toSort) {
+            elem = heap->extractMin();
+        }
+        auto end(std::chrono::steady_clock::now());
+        return std::chrono::duration_cast<std::chrono::duration<double> > (end - start).count();
+    }
+
+    void TestWith(HeapPtr heap, size_t size)
+    {
+        std::vector <int> array(size);
+        generate(array.begin(), array.end(), [this] () { return random(engine); } );
+        std::vector <int> toHeap(array);
+        std::cout << "start sorting" << std::endl;
+        double d1 = TestStdSort(array);
+        std::cout << "sorting time with std::sort is " << d1 << " seconds" << std::endl;
+        std::cout << "start sorting" << std::endl;
+        double d2 = TestHeapSort(heap, toHeap);
+        std::cout << "sorting time with heap is " << d2 << " seconds" << std::endl;
+        std::cout << "relative is " << d2 / d1 << std::endl;
+    }
+
+
+public:
+    std::uniform_int_distribution<int> random;
+    std::default_random_engine engine;
+};
+
+
+
+
 TEST_F(HeapsTest, TestCorrectSmall)
 {
     TestCorrect(SMALL_TEST);
@@ -362,12 +419,45 @@ TEST_F(HeapPerfomanceTest, TestLeftistHeap)
 
 TEST_F(HeapPerfomanceTest, TestSimpleHeap)
 {
-    int testSize = LARGE_TEST;
+    int testSize = 1e4;
     int n = (int)log((float)testSize);
     std::vector <IMergeableHeap<int> *> heaps(n, nullptr);
     generate(heaps.begin(), heaps.end(), [] () { return new SimpleHeap(); });
     TestTimeHeap(heaps, testSize);
 }
+
+TEST_F(HeapCompareWithSortTest, TestSimpleHeap)
+{
+    int testSize = LARGE_TEST;
+    HeapPtr heap = new SimpleHeap();
+    TestWith(heap, testSize);
+    delete heap;
+}
+
+TEST_F(HeapCompareWithSortTest, TestBinomialHeap)
+{
+    int testSize = LARGE_TEST;
+    HeapPtr heap = new BinomialHeap();
+    TestWith(heap, testSize);
+    delete heap;
+}
+
+TEST_F(HeapCompareWithSortTest, TestSkewHeap)
+{
+    int testSize = LARGE_TEST;
+    HeapPtr heap = new SkewHeap();
+    TestWith(heap, testSize);
+    delete heap;
+}
+
+TEST_F(HeapCompareWithSortTest, TestLeftistHeap)
+{
+    int testSize = LARGE_TEST;
+    HeapPtr heap = new LeftistHeap();
+    TestWith(heap, testSize);
+    delete heap;
+}
+
 int main(int argc, char **argv)
 {
     std::cerr.setf(std::cerr.fixed);

@@ -13,7 +13,6 @@ public:
     BinomialHeap();
     BinomialHeap(const BinomialHeap &);
     BinomialHeap(const int &);
-    BinomialHeap(Node *);
     virtual void meld(IMergeableHeap<int> &);
     virtual void insert(const int &);
     virtual int extractMin();
@@ -21,14 +20,18 @@ public:
     virtual size_t size() const;
     virtual bool empty() const;
     virtual void clear();
-    static int KEY_INFINITY;
-    Node * makeNewNode(Node *);
+    static const int KEY_INFINITY;
     void print() const;
 private:
+    void updateMin();
+    BinomialHeap(std::vector<Node *> &);
+    BinomialHeap(Node *);
+    static Node * makeNewNode(Node *);
     void shrink();
     size_t maxDegree() const;
     std::vector <Node * > trees_;
     size_t size_;
+    int min_;
 };
 
 typedef BinomialHeap::Node * BNodePtr;
@@ -41,12 +44,11 @@ class BinomialHeap::Node
 public:
     Node(int=0);
     ~Node();
-    friend size_t degree(Node *);
-    friend Node * mergeTree(Node * &, Node * &);
-    friend Node * mergeSaveDegree(Node * &, Node * &, Node * &);
-    friend int getKey(Node *);
-    friend void print(Node *, int);
-    Node * makeNewNode(Node *);
+    static size_t childrenSize(Node *);
+    static Node * mergeTree(Node * &, Node * &);
+    static void mergeSaveDegree(Node * &, Node * &, Node * &, size_t);
+    static int getKey(Node *);
+    static void print(Node *, int);
 private:
     Node(const Node &);
     int key_;

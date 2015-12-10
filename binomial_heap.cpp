@@ -2,17 +2,18 @@
 #include <functional>
 #include <algorithm>
 #include <iostream>
+#include <climits>
 
-int BinomialHeap::KEY_INFINITY = 2e9;
+const int BinomialHeap::KEY_INFINITY = INT_MAX;
 
-inline size_t degree(BinomialHeap::Node * T)
+inline size_t BinomialHeap::Node::childrenSize(BinomialHeap::Node * T)
 {
     if (T == nullptr)
-        return -1;
+        return 0;
     return T->children_.size();
 }
 
-inline int getKey(BNodePtr T)
+inline int BinomialHeap::Node::getKey(BNodePtr T)
 {
     if (T == nullptr)
         return BinomialHeap::KEY_INFINITY;
@@ -20,31 +21,28 @@ inline int getKey(BNodePtr T)
 }
 
 
-BNodePtr mergeTree(BNodePtr &A, BNodePtr &B)
+BNodePtr BinomialHeap::Node::mergeTree(BNodePtr &A, BNodePtr &B)
 {
     if (A == nullptr)
         return B;
     if (B == nullptr)
         return A;
-    if (A->key_ < B->key_) {
-        A->children_.push_back(B);
-        B = nullptr;
-        return A;
-    } else {
-        B->children_.push_back(A);
-        A = nullptr;
-        return B;
+    if (A->key_ > B->key_) {
+        std::swap(A, B);
     }
+    A->children_.push_back(B);
+    B = nullptr;
+    return A;
 }
 
-void print(BNodePtr T, int d=0)
+void BinomialHeap::Node::print(BNodePtr T, int d=0)
 {
     if (!T)
         return;
     for (int i = 0; i < d; ++i)
         std::cout << "\t";
     std::cout << T->key_ << std::endl;
-    for (size_t deg = 0; deg < degree(T); ++deg) {
+    for (size_t deg = 0; deg < childrenSize(T); ++deg) {
         print(T->children_[deg], d + 1);
     }
 }
@@ -56,24 +54,38 @@ void print(BNodePtr T, int d=0)
  *   1 + 1 = 0 and additional is 1
  * and then do not forget about additional
  */
-BNodePtr mergeSaveDegree(BNodePtr &A, BNodePtr &B, BNodePtr &additional, size_t deg)
+void BinomialHeap::Node::mergeSaveDegree(BNodePtr &A, BNodePtr &B, BNodePtr &additional, size_t deg)
 {
     A = mergeTree(A, B);
     B = nullptr;
-    if (degree(A) != deg)
+    if (childrenSize(A) != deg)
     {
         /*
          * if merging A and B returns "0" (with overflow or not)
+         * so if
+         * A == B == 0 then
+         *      A = addditinal;
+         *      additional = B = 0
+         * A == B == 1 then
+         *      A = additional;
+         *      additinal = 1;
+         *      B = 0;
          */
         std::swap(A, additional);
-        return A;
+    } else {
+        /*
+         * So A != 0 and there was not overflow
+         * we just merge others
+         */
+        A = mergeTree(A, additional);
+        additional = nullptr;
+        if (childrenSize(A) != deg) {
+            /*
+             * if overflow, push this to additinal
+             */
+            std::swap(A, additional);
+        }
     }
-    A = mergeTree(A, additional);
-    additional = nullptr;
-    if (degree(A) > deg) {
-        std::swap(A, additional);
-    }
-    return A;
 }
 
 BinomialHeap::Node::Node(int key)
@@ -86,7 +98,7 @@ BinomialHeap::Node::Node(const Node &other)
     children_.assign(other.children_.size(), nullptr);
     for (size_t deg = 0; deg < other.children_.size(); ++deg)
     {
-        children_[deg] = makeNewNode(other.children_[deg]);
+        children_[deg] = BinomialHeap::makeNewNode(other.children_[deg]);
     }
 }
 
@@ -103,20 +115,13 @@ void BinomialHeap::print() const
 {
     std::cout << "-------------" << std::endl;
     for (size_t deg = 0; deg < this->maxDegree(); ++deg) {
-        ::print(trees_[deg]);
+        Node::print(trees_[deg]);
         std::cout << "____________\n";
     }
     std::cout << "-------------" << std::endl;
 }
 
 BNodePtr BinomialHeap::makeNewNode(Node * other)
-{
-    if (!other)
-        return other;
-    return new Node(*other);
-}
-
-BNodePtr BinomialHeap::Node::makeNewNode(Node * other)
 {
     if (!other)
         return other;
@@ -130,28 +135,32 @@ void BinomialHeap::meld(IMergeableHeap<int> &otherBase)
     trees_.resize(std::max(this->maxDegree(), other.maxDegree()), nullptr);
     other.trees_.resize(std::max(this->maxDegree(), other.maxDegree()), nullptr);
     for (size_t deg = 0; deg < other.maxDegree(); ++deg) {
-        mergeSaveDegree(trees_[deg], other.trees_[deg], overflow, deg);
+        Node::mergeSaveDegree(trees_[deg], other.trees_[deg], overflow, deg);
     }
     size_ += other.size_;
     other.clear();
     if (overflow != nullptr) {
         trees_.push_back(overflow);
     }
+    min_ = std::min(min_, other.min_);
     //this->print();
 }
 
 BinomialHeap::BinomialHeap()
     : size_(0)
+    , min_(BinomialHeap::KEY_INFINITY)
 {}
 
 BinomialHeap::BinomialHeap(const int &key)
     : size_(1)
+    , min_(key)
 {
     trees_.push_back(new BinomialHeap::Node(key));
 }
 
 BinomialHeap::BinomialHeap(const BinomialHeap &other)
     : size_(other.size_)
+    , min_(other.min_)
 {
     trees_.assign(other.maxDegree(), nullptr);
     for (size_t deg = 0; deg < other.maxDegree(); ++deg)
@@ -161,9 +170,30 @@ BinomialHeap::BinomialHeap(const BinomialHeap &other)
 }
 
 BinomialHeap::BinomialHeap(BNodePtr T)
-    : size_(degree(T))
+    : size_(Node::childrenSize(T))
+    , min_(BinomialHeap::KEY_INFINITY)
 {
-    trees_.push_back(T);
+    if (T) {
+        trees_.push_back(T);
+        min_ = T->key_;
+    }
+}
+
+BinomialHeap::BinomialHeap(std::vector<Node *> &otherTrees)
+    : size_((1 << otherTrees.size()) - 1)
+{
+    trees_.swap(otherTrees);
+    updateMin();
+}
+
+void BinomialHeap::updateMin()
+{
+    min_ = BinomialHeap::KEY_INFINITY;
+    for (auto ptr : trees_) {
+        if (ptr != nullptr) {
+            min_ = std::min(min_, Node::getKey(ptr));
+        }
+    }
 }
 
 size_t BinomialHeap::maxDegree() const
@@ -186,12 +216,17 @@ void BinomialHeap::clear()
     }
     trees_.clear();
     size_ = 0;
+    min_ = BinomialHeap::KEY_INFINITY;
 }
 
 
 BinomialHeap::~BinomialHeap()
 {
-    this->clear();
+    for (auto &ptr: trees_) {
+        if (ptr) {
+            delete ptr;
+        }
+    }
 }
 
 int BinomialHeap::getMin() const
@@ -201,7 +236,7 @@ int BinomialHeap::getMin() const
     int min = BinomialHeap::KEY_INFINITY;
     for (auto ptr : trees_) {
         if (ptr != nullptr) {
-            min = std::min(min, getKey(ptr));
+            min = std::min(min, Node::getKey(ptr));
         }
     }
     return min;
@@ -209,12 +244,6 @@ int BinomialHeap::getMin() const
 
 size_t BinomialHeap::size() const
 {
-    /*size_t sum = 0;
-    for (size_t deg = 0; deg < trees_.size(); ++deg) {
-        if (trees_[deg] != nullptr)
-            sum += 1 << deg;
-    }
-    return sum;*/
     return size_;
 }
 
@@ -233,26 +262,21 @@ int BinomialHeap::extractMin()
 {
     if (trees_.size() == 0)
         throw std::range_error("erase from empty heap");
-    int minDegree = 0;
-    int min = getKey(trees_[0]);
-    for (size_t deg = 0; deg < trees_.size(); ++deg) {
-        if (trees_[deg] != nullptr) {
-            if (getKey(trees_[deg]) < min) {
-                minDegree = deg;
-                min = getKey(trees_[deg]);
-            }
+    Node * minTree = trees_.back();
+    int min = Node::getKey(minTree);
+    for (auto &ptr: trees_) {
+        if (ptr != nullptr && Node::getKey(ptr) < min) {
+            minTree = ptr;
+            min = Node::getKey(ptr);
         }
     }
     size_t was = size_;
-    Node * minTree = trees_[minDegree];
-    trees_[minDegree] = nullptr;
-    for (BNodePtr &ptr : minTree->children_) {
-        BinomialHeap tmp(ptr);
-        this->meld(tmp);
-        ptr = nullptr;
-    }
+    trees_[Node::childrenSize(minTree)] = nullptr;
+    BinomialHeap tmp(minTree->children_);
+    this->meld(tmp);
     this->shrink();
     delete minTree;
     size_ = was - 1;
+    updateMin();
     return min;
 }
