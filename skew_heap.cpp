@@ -82,16 +82,15 @@ SkewHeap::Node * SkewHeap::merge(SkewHeap::Node *A, SkewHeap::Node *B)
         return B;
     if (!B)
         return A;
-    if (A->getKey() <= B->getKey()) {
-        A->getRight() = merge(A->getRight(), B);
-        if (needRotate(A)) {
-            std::swap(A->getRight(), A->getLeft());
-        }
-        recalc(A);
-        return A;
-    } else {
-        return merge(B, A);
+    if (A->getKey() > B->getKey()) {
+        std::swap(A, B);
     }
+    A->getRight() = merge(A->getRight(), B);
+    if (needRotate(A)) {
+        std::swap(A->getRight(), A->getLeft());
+    }
+    recalc(A);
+    return A;
 }
 
 
@@ -104,7 +103,7 @@ void SkewHeap::recalc(Node * &T) const
 {
     if (!T)
         return;
-    T->size_ = ::size(T->getLeft()) + ::size(T->getRight()) + 1;
+    T->size_ = SkewTreeNode::size(T->getLeft()) + SkewTreeNode::size(T->getRight()) + 1;
 }
 
 
@@ -152,7 +151,7 @@ SkewHeap::SkewTreeNode::SkewTreeNode(const SkewTreeNode &other)
     right_ = makeNewPtr(other.right_);
 }
 
-size_t size(SkewHeap::NodePtr T)
+size_t SkewHeap::SkewTreeNode::size(SkewHeap::NodePtr T)
 {
     return T ? T->size_ : 0;
 }

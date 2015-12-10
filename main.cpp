@@ -428,7 +428,7 @@ TEST_F(HeapPerfomanceTest, TestSimpleHeap)
 
 TEST_F(HeapCompareWithSortTest, TestSimpleHeap)
 {
-    int testSize = LARGE_TEST;
+    int testSize = EXTRA_LARGE_TEST;
     HeapPtr heap = new SimpleHeap();
     TestWith(heap, testSize);
     delete heap;
@@ -436,7 +436,7 @@ TEST_F(HeapCompareWithSortTest, TestSimpleHeap)
 
 TEST_F(HeapCompareWithSortTest, TestBinomialHeap)
 {
-    int testSize = LARGE_TEST;
+    int testSize = EXTRA_LARGE_TEST;
     HeapPtr heap = new BinomialHeap();
     TestWith(heap, testSize);
     delete heap;
@@ -444,7 +444,7 @@ TEST_F(HeapCompareWithSortTest, TestBinomialHeap)
 
 TEST_F(HeapCompareWithSortTest, TestSkewHeap)
 {
-    int testSize = LARGE_TEST;
+    int testSize = EXTRA_LARGE_TEST;
     HeapPtr heap = new SkewHeap();
     TestWith(heap, testSize);
     delete heap;
@@ -452,7 +452,7 @@ TEST_F(HeapCompareWithSortTest, TestSkewHeap)
 
 TEST_F(HeapCompareWithSortTest, TestLeftistHeap)
 {
-    int testSize = LARGE_TEST;
+    int testSize = EXTRA_LARGE_TEST;
     HeapPtr heap = new LeftistHeap();
     TestWith(heap, testSize);
     delete heap;

@@ -47,7 +47,7 @@ public:
     virtual ~SkewTreeNode();
     SkewTreeNode(const int &);
     SkewTreeNode(const SkewTreeNode &);
-    friend size_t size(SkewTreeNode *);
+    static size_t size(SkewTreeNode *);
     virtual SkewTreeNode *& getLeft();
     virtual SkewTreeNode *& getRight();
     virtual int& getKey();
@@ -57,7 +57,6 @@ public:
     size_t size_;
 };
 
-size_t size(SkewHeap::Node *);
 
 void print(SkewHeap::Node *, int);
 
