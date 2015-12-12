@@ -15,7 +15,7 @@ protected:
     LeftistTreeNode * castNode(Node *) const;
     size_t getRang(Node *) const;
     virtual void recalc(Node * &) const;
-    virtual bool needRotate(Node *) const;
+    virtual bool needRotate(const Node *) const;
     virtual SkewHeap::Node * makeTreePtr(int) const;
 };
 

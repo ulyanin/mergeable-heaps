@@ -28,7 +28,7 @@ protected:
     Node * root;
     virtual Node * merge(Node * A, Node * B);
     virtual void recalc(Node * &) const;
-    virtual bool needRotate(Node *) const;
+    virtual bool needRotate(const Node *) const;
     virtual Node * makeTreePtr(int) const;
 };
 

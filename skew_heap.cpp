@@ -94,7 +94,7 @@ SkewHeap::Node * SkewHeap::merge(SkewHeap::Node *A, SkewHeap::Node *B)
 }
 
 
-bool SkewHeap::needRotate(SkewHeap::SkewTreeNode *) const
+bool SkewHeap::needRotate(const SkewHeap::SkewTreeNode *) const
 {
     return true;
 }

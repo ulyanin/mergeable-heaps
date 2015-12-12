@@ -39,7 +39,7 @@ void LeftistHeap::recalc(SkewHeap::Node * &T) const
                                       getRang(T->getRight())) + 1;
 }
 
-bool LeftistHeap::needRotate(SkewHeap::Node * T) const
+bool LeftistHeap::needRotate(const SkewHeap::Node * T) const
 {
     if (!T)
         return 0;
@@ -52,25 +52,6 @@ SkewHeap::Node * LeftistHeap::makeTreePtr(int key) const
     return new LeftistTreeNode(key);
 }
 
-/*
-SkewHeap::Node * LeftistHeap::merge(SkewHeap::Node *A, SkewHeap::Node *B)
-{
-    if (!A)
-        return B;
-    if (!B)
-        return A;
-    if (A->getKey() <= B->getKey()) {
-        A->getRight() = merge(A->getRight(), B);
-        if (needRotate(A)) {
-            std::cout << "rotating" << std::endl;
-            std::swap(A->getRight(), A->getLeft());
-            recalc(A);
-        }
-        return A;
-    } else {
-        return merge(B, A);
-    }
-}*/
 LeftistHeap::LeftistTreeNode::~LeftistTreeNode()
 {}
 
