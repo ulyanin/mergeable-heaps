@@ -13,7 +13,7 @@
 const int SMALL_TEST = 10;
 const int MEDIUM_TEST = 1e4;
 const int LARGE_TEST = 1e5;
-const int EXTRA_LARGE_TEST = 1e7;
+const int EXTRA_LARGE_TEST = 5e6;
 const int MAX_TEST = 1e8;
 
 class HeapsTest : public ::testing::Test

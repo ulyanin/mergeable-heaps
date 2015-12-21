@@ -2,14 +2,13 @@
 #define SKEW_HEAP_H
 
 #include "imergeable_heap.h"
+#include <memory>
 
 class SkewHeap : public IMergeableHeap<int>
 {
 protected:
     class SkewTreeNode;
 public:
-    typedef SkewTreeNode Node;
-    typedef SkewTreeNode * NodePtr;
     virtual ~SkewHeap();
     SkewHeap();
     SkewHeap(const SkewHeap &);
@@ -25,39 +24,42 @@ public:
     //size_t getRang(Node *) const;
     static int KEY_INFINITY;
 protected:
-    Node * root;
-    virtual Node * merge(Node * A, Node * B);
-    virtual void recalc(Node * &) const;
-    virtual bool needRotate(const Node *) const;
-    virtual Node * makeTreePtr(int) const;
+    typedef SkewTreeNode Node;
+    typedef std::unique_ptr<Node> NodePtr;
+    NodePtr root;
+    virtual NodePtr merge(NodePtr &A, NodePtr &B);
+    virtual void recalc(NodePtr &) const;
+    virtual bool needRotate(const NodePtr &) const;
+    virtual NodePtr makeTreePtr(int) const;
+    static void print(const NodePtr &, int);
 };
 
 template <class T>
-T * makeNewPtr(T * ptr)
+std::unique_ptr<T> makeNewPtr(const std::unique_ptr<T> &ptr)
 {
     if (!ptr)
-        return ptr;
-    return new T(*ptr);
+        return std::move(std::unique_ptr<T>(nullptr));
+    return std::move(std::unique_ptr<T>(new T(*ptr)));
 }
 
 class SkewHeap::SkewTreeNode
 {
+    friend class SkewHeap;
 public:
     SkewTreeNode();
     virtual ~SkewTreeNode();
     SkewTreeNode(const int &);
     SkewTreeNode(const SkewTreeNode &);
-    static size_t size(SkewTreeNode *);
-    virtual SkewTreeNode *& getLeft();
-    virtual SkewTreeNode *& getRight();
+    static size_t size(const NodePtr &);
+    virtual NodePtr & getLeft();
+    virtual NodePtr & getRight();
     virtual int& getKey();
-    Node * left_,
-         * right_;
+    NodePtr left_,
+            right_;
     int key_;
     size_t size_;
 };
 
 
-void print(SkewHeap::Node *, int);
 
 #endif

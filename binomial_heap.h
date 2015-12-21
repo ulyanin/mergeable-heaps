@@ -35,9 +35,6 @@ private:
     int min_;
 };
 
-//typedef BinomialHeap::Node * BNodePtr;
-//typedef const BinomialHeap::Node * CBNodePtr;
-
 
 class BinomialHeap::Node
 {

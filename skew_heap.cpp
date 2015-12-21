@@ -7,11 +7,10 @@ int SkewHeap::KEY_INFINITY = INT_MAX;
 
 SkewHeap::~SkewHeap()
 {
-    delete root;
 }
 
 SkewHeap::SkewHeap()
-    : root(nullptr)
+    : root(NodePtr(nullptr))
 {}
 
 SkewHeap::SkewHeap(const SkewHeap &other)
@@ -21,7 +20,7 @@ SkewHeap::SkewHeap(const SkewHeap &other)
 
 SkewHeap::SkewHeap(const int &key)
 {
-   root = new Node(key);
+   root = NodePtr(new Node(key));
 }
 
 void SkewHeap::meld(IMergeableHeap<int> &otherBase)
@@ -33,7 +32,8 @@ void SkewHeap::meld(IMergeableHeap<int> &otherBase)
 
 void SkewHeap::insert(const int &key)
 {
-    root = merge(root, makeTreePtr(key));
+    NodePtr tmp(std::move(makeTreePtr(key)));
+    root = merge(root, tmp);
 }
 
 int SkewHeap::getMin() const
@@ -46,18 +46,17 @@ int SkewHeap::getMin() const
 int SkewHeap::extractMin()
 {
     int min = this->getMin();
-    Node * left(root->getLeft()),
-         * right(root->getRight());
-    root->getLeft() = nullptr;
-    root->getRight() = nullptr;
-    delete root;
+    NodePtr left(std::move(root->getLeft())),
+            right(std::move(root->getRight()));
+    root->getLeft() = NodePtr(nullptr);
+    root->getRight() = NodePtr(nullptr);
     root = merge(left, right);
     return min;
 }
 
-SkewHeap::Node * SkewHeap::makeTreePtr(int key) const
+SkewHeap::NodePtr SkewHeap::makeTreePtr(int key) const
 {
-    return new Node(key);
+    return std::move(NodePtr(new Node(key)));
 }
 
 size_t SkewHeap::size() const
@@ -72,34 +71,33 @@ bool SkewHeap::empty() const
 
 void SkewHeap::clear()
 {
-    delete root;
-    root = nullptr;
+    root = NodePtr(nullptr);
 }
 
-SkewHeap::Node * SkewHeap::merge(SkewHeap::Node *A, SkewHeap::Node *B)
+SkewHeap::NodePtr SkewHeap::merge(NodePtr &A, NodePtr &B)
 {
     if (!A)
-        return B;
+        return std::move(B);
     if (!B)
-        return A;
+        return std::move(A);
     if (A->getKey() > B->getKey()) {
-        std::swap(A, B);
+        A.swap(B);
     }
     A->getRight() = merge(A->getRight(), B);
     if (needRotate(A)) {
-        std::swap(A->getRight(), A->getLeft());
+        A->getRight().swap(A->getLeft());
     }
     recalc(A);
-    return A;
+    return std::move(A);
 }
 
 
-bool SkewHeap::needRotate(const SkewHeap::SkewTreeNode *) const
+bool SkewHeap::needRotate(const NodePtr &) const
 {
     return true;
 }
 
-void SkewHeap::recalc(Node * &T) const
+void SkewHeap::recalc(NodePtr &T) const
 {
     if (!T)
         return;
@@ -124,21 +122,19 @@ int& SkewHeap::SkewTreeNode::getKey()
 }
 
 SkewHeap::SkewTreeNode::SkewTreeNode()
-    : left_(nullptr)
-    , right_(nullptr)
+    : left_(NodePtr(nullptr))
+    , right_(NodePtr(nullptr))
     , key_(0)
     , size_(0)
 {}
 
 SkewHeap::SkewTreeNode::~SkewTreeNode()
 {
-    delete left_;
-    delete right_;
 }
 
 SkewHeap::SkewTreeNode::SkewTreeNode(const int &key)
-    : left_(nullptr)
-    , right_(nullptr)
+    : left_(NodePtr(nullptr))
+    , right_(NodePtr(nullptr))
     , key_(key)
     , size_(1)
 {}
@@ -151,12 +147,12 @@ SkewHeap::SkewTreeNode::SkewTreeNode(const SkewTreeNode &other)
     right_ = makeNewPtr(other.right_);
 }
 
-size_t SkewHeap::SkewTreeNode::size(SkewHeap::NodePtr T)
+size_t SkewHeap::SkewTreeNode::size(const SkewHeap::NodePtr &T)
 {
     return T ? T->size_ : 0;
 }
 
-void print(SkewHeap::Node * T, int d=0)
+void SkewHeap::print(const SkewHeap::NodePtr &T, int d=0)
 {
     if (!T)
         return;
@@ -169,5 +165,5 @@ void print(SkewHeap::Node * T, int d=0)
 
 void SkewHeap::print() const
 {
-    ::print(root);
+    print(root);
 }

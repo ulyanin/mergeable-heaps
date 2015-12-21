@@ -13,10 +13,10 @@ public:
     LeftistHeap(const int &);
 protected:
     LeftistTreeNode * castNode(Node *) const;
-    size_t getRang(Node *) const;
-    virtual void recalc(Node * &) const;
-    virtual bool needRotate(const Node *) const;
-    virtual SkewHeap::Node * makeTreePtr(int) const;
+    size_t getRang(const NodePtr &) const;
+    virtual void recalc(NodePtr &) const;
+    virtual bool needRotate(const NodePtr &) const;
+    virtual SkewHeap::NodePtr makeTreePtr(int) const;
 };
 
 class LeftistHeap::LeftistTreeNode : public SkewHeap::SkewTreeNode
