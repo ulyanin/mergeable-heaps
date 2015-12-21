@@ -20,7 +20,9 @@ class HeapsTest : public ::testing::Test
 {
 protected:
     virtual void SetUp()
-    {}
+    {
+        engine.seed(179);
+    }
 
     virtual void TearDown()
     {
@@ -216,7 +218,9 @@ class HeapPerfomanceTest : public ::testing::Test
 protected:
     typedef IMergeableHeap<int> * HeapPtr;
     virtual void SetUp()
-    {}
+    {
+        engine.seed(179);
+    }
 
     virtual void TearDown()
     {
@@ -330,6 +334,7 @@ protected:
     typedef IMergeableHeap<int> * HeapPtr;
     virtual void SetUp()
     {
+        engine.seed(179);
     }
 
     virtual void TearDown()

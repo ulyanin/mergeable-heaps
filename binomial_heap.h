@@ -38,7 +38,7 @@ private:
 
 class BinomialHeap::Node
 {
-    friend BinomialHeap;
+    friend class BinomialHeap;
 public:
     Node(int=0);
     ~Node();
