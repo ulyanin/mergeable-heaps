@@ -23,19 +23,20 @@ public:
     static const int KEY_INFINITY;
     void print() const;
 private:
+    typedef std::unique_ptr<BinomialHeap::Node> NodePtr;
     void updateMin();
-    BinomialHeap(std::vector<Node *> &);
-    BinomialHeap(Node *);
-    static Node * makeNewNode(Node *);
+    BinomialHeap(std::vector<NodePtr> &);
+    BinomialHeap(NodePtr &);
+    static NodePtr makeNewNode(const NodePtr &);
     void shrink();
     size_t maxDegree() const;
-    std::vector <Node * > trees_;
+    std::vector <NodePtr> trees_;
     size_t size_;
     int min_;
 };
 
-typedef BinomialHeap::Node * BNodePtr;
-typedef const BinomialHeap::Node * CBNodePtr;
+//typedef BinomialHeap::Node * BNodePtr;
+//typedef const BinomialHeap::Node * CBNodePtr;
 
 
 class BinomialHeap::Node
@@ -44,15 +45,15 @@ class BinomialHeap::Node
 public:
     Node(int=0);
     ~Node();
-    static size_t childrenSize(Node *);
-    static Node * mergeTree(Node * &, Node * &);
-    static void mergeSaveDegree(Node * &, Node * &, Node * &, size_t);
-    static int getKey(Node *);
-    static void print(Node *, int);
+    static size_t childrenSize(const NodePtr &);
+    static NodePtr mergeTree(NodePtr &, NodePtr &);
+    static void mergeSaveDegree(NodePtr &, NodePtr &, NodePtr &, size_t);
+    static int getKey(const NodePtr &);
+    static void print(const NodePtr &, int);
 private:
     Node(const Node &);
     int key_;
-    std::vector<Node *> children_;
+    std::vector<NodePtr> children_;
 };
 
 
